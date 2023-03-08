@@ -1,25 +1,50 @@
 import sounddevice as sd
-import soundfile as sf
 import numpy as np
+import threading
+import wave
 
-# Paramètres de l'enregistrement audio
-duration = 5  # durée de l'enregistrement en secondes
-fs = 44100  # fréquence d'échantillonnage en Hz
-channels = 1  # nombre de canaux audio (mono = 1)
+class Recorder:
+    def __init__(self, filename):
+        self.filename = filename
+        self.frames = []
+        self.recording = False
 
-# Fréquence du son émis
-f = 440
+    def start_recording(self, channels, samplerate):
+        self.recording = True
+        self.frames = []
+        threading.Thread(target=self.record, args=(channels, samplerate)).start()
 
-# Génération du signal sonore
-t = np.linspace(0, duration, int(duration * fs), False)
-sinewave = np.sin(f * 2 * np.pi * t)
+    def stop_recording(self):
+        self.recording = False
 
-# Émission du signal sonore
-sd.play(sinewave, fs)
+    def record(self, channels, samplerate):
+        with wave.open(self.filename, mode='wb') as wf:
+            wf.setnchannels(channels)
+            wf.setsampwidth(2)
+            wf.setframerate(samplerate)
+            with sd.InputStream(channels=channels, samplerate=samplerate, blocksize=1024) as stream:
+                while self.recording:
+                    data, _ = stream.read(1024)
+                    self.frames.append(data)
+                    wf.writeframes(data)
 
-# Enregistrement de l'acquisition audio dans un fichier
-print("Enregistrement audio en cours...")
-recording = sd.rec(int(duration * fs), samplerate=fs, channels=channels)
-sd.wait()
-sf.write("enregistrement.wav", recording, fs)
-print("Enregistrement audio terminé.")
+    def get_frames(self):
+        return self.frames
+
+def play_sound():
+    duration = 5.0
+    samplerate = sd.query_devices('default')['default_samplerate']
+    samples = int(duration * samplerate)
+    sound = np.random.randn(samples, 1)
+    sd.play(sound, samplerate=samplerate)
+    sd.wait()
+
+recorder = Recorder('enregistrement.wav')
+recorder.start_recording(channels=1, samplerate=44100)
+
+play_sound()
+
+recorder.stop_recording()
+frames = recorder.get_frames()
+
+print('Enregistrement terminé.')
