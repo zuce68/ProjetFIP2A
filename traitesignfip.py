@@ -1,3 +1,10 @@
+import sounddevice as sd
+import soundfile as sf
+# Bibliothèques pour analyse traitement du signal
+import scipy.io.wavfile
+import matplotlib.pyplot as plt
+import numpy as np
+
 """
 TRAITESIGNFIP - Module Python pour les communications numériques à Télécom Physique Strasbourg (spécifiquement pour la formation FIP EII).
 
