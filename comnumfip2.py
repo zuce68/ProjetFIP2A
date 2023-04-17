@@ -600,7 +600,7 @@ def rledec(code):
     return msg
 
 
-def sample_and_threshold(x, T, S):
+def sample_and_threshold(x, S):
     
     """
     Échantillonne à la période T et compare au seuil S le signal x,
@@ -615,7 +615,7 @@ def sample_and_threshold(x, T, S):
     y (array) : séquence binaire
     """
     
-    L = 100
+    L = 4
     idx = range(int(L/2), len(x), L)
     y = np.where(x[idx]>S, 1, 0)
     
