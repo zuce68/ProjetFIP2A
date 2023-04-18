@@ -25,7 +25,7 @@ def receive_signal():
         mask = (signal<-0.9) | (signal>0.9) #On garde tout ce qui a une amplitude de plus de 0.9V
         signal_triggered = signal[mask]
     return signal
-    
+
 def plot_signal(signal):
     plt.figure()
     plt.plot(signal)
