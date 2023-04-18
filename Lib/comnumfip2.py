@@ -628,4 +628,5 @@ def bin2ascii(bits):
     bits_str =''.join(str(bit) for bit in bits)
     bytes_list = [bits_str[i:i+8] for i in range(0, len(bits_str), 8)] # Convertir chaque groupe de 8 bits en un caractère ASCII 
     ascii_str = ''.join([chr(int(byte, 2)) for byte in bytes_list]) 
+    
     return ascii_str
