@@ -146,20 +146,6 @@ def bin2ascii(bits): # Séparer les bits en groupes de 8
     ascii_str = ''.join([chr(int(byte, 2)) for byte in bytes_list]) 
     return ascii_str
 
-"""
-COMNUMFIP - Module Python pour les communications numériques à Télécom Physique Strasbourg (spécifiquement pour la formation FIP EII).
-
-Ce programme est distribué sous licence CeCILL-B (www.cecill.info).
-Copyright Université de Strasbourg 2013-2022 (2022-03-04)
-Contributeur : vincent.mazet@unistra.fr
-"""
-
-
-import numpy as np
-import numpy.random as rnd
-import scipy.signal as signal
-import matplotlib.pyplot as plt
-
 
 def eyediag(t, x, T, alpha=.5, color="tab:blue"):
     
@@ -256,6 +242,12 @@ def randmary(N,p):
     
     return c
 
+def record():
+    fs=44100
+    duration=5
+    record = sd.rec(int(duration*fs),samplerate=fs,channels=1)
+    sd.wait()
+    return record
 
 def bin2mary(x,M):
     
@@ -620,3 +612,9 @@ def sample_and_threshold(x, S):
     y = np.where(x[idx]>S, 1, 0)
     
     return y
+
+def bin2ascii(bits): # Séparer les bits en groupes de 8 
+    bits_str =''.join(str(bit) for bit in bits)
+    bytes_list = [bits_str[i:i+8] for i in range(0, len(bits_str), 8)] # Convertir chaque groupe de 8 bits en un caractère ASCII 
+    ascii_str = ''.join([chr(int(byte, 2)) for byte in bytes_list]) 
+    return ascii_str

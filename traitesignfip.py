@@ -12,10 +12,23 @@ import soundfile as sf
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
 import numpy as np
-
 import threading
 
-
+def read_signal(file):
+    """
+    Permet de créer un tableau avec les valeurs d'un fichier son. 
+    
+    Entrées :
+    file (string)      : nom du fichier audio.
+    
+    Sortie :
+    data_left (tableau) : Données du premier canal.
+    data_right (tableau) : Données du deuxième canal.
+    """
+    rate, data = scipy.io.wavfile.read('enregistrement.wav')#Lecture du fichier où l'acquisition a été enregistrée 
+    data_right = data[:,1]
+    data_left = data[:,0]
+    return data_left,data_right
 
 def play_signal(signal, sample_rate):
     """
