@@ -613,7 +613,18 @@ def sample_and_threshold(x, S):
     
     return y
 
-def bin2ascii(bits): # Séparer les bits en groupes de 8 
+def bin2ascii(bits): 
+
+    """
+    Sépare le tableau de bit en groupe de 8 puis convertit chaque octet en un caractère ascii.
+    
+    Entrées :
+    bits (array)  : tableau de bits
+    
+    Sortie :
+    ascii_str (string) : chaîne de caractère ascii
+    """
+
     bits_str =''.join(str(bit) for bit in bits)
     bytes_list = [bits_str[i:i+8] for i in range(0, len(bits_str), 8)] # Convertir chaque groupe de 8 bits en un caractère ASCII 
     ascii_str = ''.join([chr(int(byte, 2)) for byte in bytes_list]) 
