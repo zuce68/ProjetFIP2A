@@ -14,6 +14,17 @@ import sounddevice as sd
 def send_signal_to_canal(signal):
     sd.play(signal, 44100)
     sd.wait()
+
+def receive_signal():
+    fs=44100
+    duration=1
+    signal_triggered =[]
+    while len(signal_triggered)==0:
+        signal = sd.rec(int(duration*fs),samplerate=fs,channels=1)
+        sd.wait()
+        mask = (signal<-0.9) | (signal>0.9) #On garde tout ce qui a une amplitude de plus de 0.9V
+        signal_triggered = signal[mask]
+    return signal
     
 def plot_signal(signal):
     plt.figure()
