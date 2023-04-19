@@ -24,11 +24,10 @@ def AMI_signal_generator(message):
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
+    frequence = 10000  # Fréquence du signal en Hz
     duree_bit = 1/frequence  # Durée d'un bit en secondes
     # Convertir le message en une séquence de bits (0 et 1)
     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-    print(bits)
     # Générer le signal AMI
     temps_bit = np.linspace(0, duree_bit, int(duree_bit * framerate), endpoint=False)
     signal_ami = np.zeros(0)
@@ -39,32 +38,37 @@ def AMI_signal_generator(message):
         else:
             signal_ami = np.append(signal_ami, -amplitude * np.ones_like(temps_bit))
             precedent_bit = bit
+             # Ajouter des zéros au début et à la fin du signal
+    signal_ami = np.pad(signal_ami, (int(framerate/2), int(framerate/2)), 'constant')
     return signal_ami
 
 def NRZ_signal_generator(message):
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
-    amplitude = 0.5   # Amplitude du signal
+    amplitude = 1   # Amplitude du signal
     frequence = 4410  # Fréquence du signal en Hz
     duree_bit = 1/frequence  # Durée d'un bit en secondes
     # Convertir le message en une séquence de bits (0 et 1)
     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-    print(bits)
     # Générer le signal NRZ
     temps_bit = np.linspace(0, duree_bit, int(duree_bit * framerate), endpoint=False)
     signal_nrz = np.zeros(0)
     for bit in bits:
         if bit == 0:
-            signal_nrz = np.append(signal_nrz, -amplitude * np.ones_like(temps_bit))
-        else:
             signal_nrz = np.append(signal_nrz, amplitude * np.ones_like(temps_bit))
+        else:
+            signal_nrz = np.append(signal_nrz, -amplitude * np.ones_like(temps_bit))
+         # Ajouter des zéros au début et à la fin du signal
+    signal_nrz = np.pad(signal_nrz, (int(framerate/2), int(framerate/2)), 'constant')
+    print(bits)
+    print(len(bits))
     return signal_nrz
 
 def manchester_signal_generator(message):
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
+    frequence = 10000  # Fréquence du signal en Hz
     duree_bit = 1/frequence  # Durée d'un bit en secondes
     # Convertir le message en une séquence de bits (0 et 1)
     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
@@ -78,73 +82,10 @@ def manchester_signal_generator(message):
         else:
             signal_manchester = np.append(signal_manchester, -amplitude * np.ones_like(temps_bit))
             signal_manchester = np.append(signal_manchester, amplitude * np.ones_like(temps_bit))
+     # Ajouter des zéros au début et à la fin du signal
+    signal_manchester = np.pad(signal_manchester, (int(framerate/2), int(framerate/2)), 'constant')
+
     return signal_manchester
-
-def AMI_signal_generator(message):
-    # Paramètres du signal Manchester
-    framerate = 44100 # Fréquence d'échantillonnage en Hz
-    amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
-    duree_bit = 1/frequence  # Durée d'un bit en secondes
-    # Convertir le message en une séquence de bits (0 et 1)
-    bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-    print(bits)
-    # Générer le signal AMI
-    temps_bit = np.linspace(0, duree_bit, int(duree_bit * framerate), endpoint=False)
-    signal_ami = np.zeros(0)
-    precedent_bit = 0
-    for bit in bits:
-        if bit == 0:
-            signal_ami = np.append(signal_ami, amplitude * np.ones_like(temps_bit))
-        else:
-            signal_ami = np.append(signal_ami, -amplitude * np.ones_like(temps_bit))
-            precedent_bit = bit
-    return signal_ami
-
-def NRZ_signal_generator(message):
-    # Paramètres du signal Manchester
-    framerate = 44100 # Fréquence d'échantillonnage en Hz
-    amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
-    duree_bit = 1/frequence  # Durée d'un bit en secondes
-    # Convertir le message en une séquence de bits (0 et 1)
-    bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-    print(bits)
-    # Générer le signal NRZ
-    temps_bit = np.linspace(0, duree_bit, int(duree_bit * framerate), endpoint=False)
-    signal_nrz = np.zeros(0)
-    for bit in bits:
-        if bit == 0:
-            signal_nrz = np.append(signal_nrz, -amplitude * np.ones_like(temps_bit))
-        else:
-            signal_nrz = np.append(signal_nrz, amplitude * np.ones_like(temps_bit))
-    return signal_nrz
-
-def manchester_signal_generator(message):
-    # Paramètres du signal Manchester
-    framerate = 44100 # Fréquence d'échantillonnage en Hz
-    amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
-    duree_bit = 1/frequence  # Durée d'un bit en secondes
-    # Convertir le message en une séquence de bits (0 et 1)
-    bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-    # Générer le signal Manchester
-    temps_bit = np.linspace(0, duree_bit, int(duree_bit * framerate), endpoint=False)
-    signal_manchester = np.zeros(0)
-    for bit in bits:
-        if bit == 0:
-            signal_manchester = np.append(signal_manchester, amplitude * np.ones_like(temps_bit))
-            signal_manchester = np.append(signal_manchester, -amplitude * np.ones_like(temps_bit))
-        else:
-            signal_manchester = np.append(signal_manchester, -amplitude * np.ones_like(temps_bit))
-            signal_manchester = np.append(signal_manchester, amplitude * np.ones_like(temps_bit))
-    return signal_manchester
-
-def bin2ascii(bits): # Séparer les bits en groupes de 8 
-    bits_str =''.join(str(bit) for bit in bits)
-    bytes_list = [bits_str[i:i+8] for i in range(0, len(bits_str), 8)] # Convertir chaque groupe de 8 bits en un caractère ASCII 
-    ascii_str = ''.join([chr(int(byte, 2)) for byte in bytes_list]) 
-    return ascii_str
 
 
 def eyediag(t, x, T, alpha=.5, color="tab:blue"):
