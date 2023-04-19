@@ -144,3 +144,12 @@ def play_and_record(signal_type,time):
     sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
     # Attendre la fin de la lecture du signal sur les haut-parleurs
     play_thread.join()
+
+def lissage(signal_brut,L):
+    res = np.copy(signal_brut) # duplication des valeurs
+    for i in range (1,len(signal_brut)-1): # toutes les valeurs sauf la première et la dernière
+        L_g = min(i,L) # nombre de valeurs disponibles à gauche
+        L_d = min(len(signal_brut)-i-1,L) # nombre de valeurs disponibles à droite
+        Li=min(L_g,L_d)
+        res[i]=np.sum(signal_brut[i-Li:i+Li+1])/(2*Li+1)
+    return res
