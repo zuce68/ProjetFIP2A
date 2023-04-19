@@ -85,6 +85,11 @@ def record_microphone(signal_type,time):
         zeros = np.zeros((duration-time)*sample_rate)
         samples=np.sin(2*np.pi*500*t)*np.exp(-5*t)
         signal = np.concatenate((zeros,samples))
+    elif signal_type == "edge":
+        zeros = np.zeros((duration-time)*sample_rate)
+        frequency = 440  # Hz
+        samples = np.sign((np.sin(2 * np.pi * np.arange(sample_rate * time ) * frequency / sample_rate))).astype(np.float32)
+        signal = np.concatenate((zeros,samples))
     else:
         print("Type de signal non reconnu.")
         return

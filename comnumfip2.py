@@ -45,7 +45,7 @@ def NRZ_signal_generator(message):
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
+    frequence = 4410  # Fréquence du signal en Hz
     duree_bit = 1/frequence  # Durée d'un bit en secondes
     # Convertir le message en une séquence de bits (0 et 1)
     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))

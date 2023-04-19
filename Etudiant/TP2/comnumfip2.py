@@ -44,9 +44,8 @@ def AMI_signal_generator(message):
 def NRZ_signal_generator(message):
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
-    amplitude = 0.5   # Amplitude du signal
-    frequence = 1000  # Fréquence du signal en Hz
-    duree_bit = 1/frequence  # Durée d'un bit en secondes
+    amplitude = 1  # Amplitude du signal
+    duree_bit = 10E-3 # Durée d'un bit en secondes
     # Convertir le message en une séquence de bits (0 et 1)
     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
     print(bits)
@@ -607,7 +606,7 @@ def sample_and_threshold(x, S):
     y (array) : séquence binaire
     """
     
-    L = 4
+    L = int(10E-3*44100)
     idx = range(int(L/2), len(x), L)
     y = np.where(x[idx]>S, 1, 0)
     

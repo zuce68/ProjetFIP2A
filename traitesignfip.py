@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import threading
 
-def read_signal(file):
+def read_signal():
     """
     Permet de créer un tableau avec les valeurs d'un fichier son. 
     
@@ -44,8 +44,17 @@ def play_signal(signal, sample_rate):
     sd.play(signal, sample_rate)
     sd.wait()
 
+def record():
+    sample_rate=44100
+    channels=2
+    recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
+    sd.wait()  # Attendre la fin de l'enregistrement
+    # Enregistrer les données audio dans un fichier WAV
+    file_name = "enregistrement.wav"
+    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
+    
 # Fonction pour enregistrer le son du microphone
-def record_microphone(signal_type,time):
+def play_and_record(signal_type,time):
     """
     Acquisition du son via microphone.
     
@@ -72,10 +81,29 @@ def record_microphone(signal_type,time):
     t = np.linspace(0,1*time,int(sample_rate),endpoint=False)
  
     
-    if signal_type == "noise":
+    if signal_type == "whitenoise":
         zeros = np.zeros((duration-time)*sample_rate)
         samples = np.random.normal(0, 1, time*sample_rate)
         signal = np.concatenate((zeros,samples))
+    elif signal_type == "pinknoise":
+        zeros = np.zeros((duration-time)*sample_rate)
+                # Génération du bruit rose
+        b = [0.049922035, -0.095993537, 0.050612699, -0.004408786]
+        a = [1, -2.494956002, 2.017265875, -0.522189400]
+        pink_noise = np.zeros(time*sample_rate)
+        pink_noise[0] = np.random.normal()
+        for i in range(1, time*sample_rate):
+            white_noise = np.random.normal()
+            pink_noise[i] = b[0] * white_noise + \
+                b[1] * pink_noise[i - 1] + \
+                b[2] * pink_noise[max(0, i - 2)] + \
+                b[3] * pink_noise[max(0, i - 3)]
+            pink_noise[i] /= a[0] + \
+                a[1] * pink_noise[max(0, i - 1)] + \
+                a[2] * pink_noise[max(0, i - 2)] + \
+                a[3] * pink_noise[max(0, i - 3)]
+        samples=pink_noise
+        signal = np.concatenate((zeros,samples))    
     elif signal_type == "sinus":
         zeros = np.zeros((duration-time)*sample_rate)
         frequency = 440  # Hz
@@ -84,6 +112,21 @@ def record_microphone(signal_type,time):
     elif signal_type == "clap":
         zeros = np.zeros((duration-time)*sample_rate)
         samples=np.sin(2*np.pi*500*t)*np.exp(-5*t)
+        signal = np.concatenate((zeros,samples))
+    elif signal_type == "edge":
+        zeros = np.zeros((duration-time)*sample_rate)
+        frequency = 440  # Hz
+        samples = np.sign((np.sin(2 * np.pi * np.arange(sample_rate * time ) * frequency / sample_rate))).astype(np.float32)
+        signal = np.concatenate((zeros,samples))
+    elif signal_type == "triangle":
+        zeros = np.zeros((duration-time)*sample_rate)
+        frequency = 440  # Hz
+        samples = np.arcsin(np.sin(2*np.pi*frequency*t))
+        signal = np.concatenate((zeros,samples))
+    elif signal_type == "sawtooth":
+        zeros = np.zeros((duration-time)*sample_rate)
+        frequency = 440  # Hz
+        samples = 2*(t*2*np.pi*frequency - 2*np.floor((t*2*np.pi*frequency+1)/2))
         signal = np.concatenate((zeros,samples))
     else:
         print("Type de signal non reconnu.")
