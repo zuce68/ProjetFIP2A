@@ -170,12 +170,3 @@ def play_and_record(signal_type,time):
     data_left = recorded_audio[:,0]
 
     return data_left,data_right,samples
-
-def lissage(signal_brut,L):
-    res = np.copy(signal_brut) # duplication des valeurs
-    for i in range (1,len(signal_brut)-1): # toutes les valeurs sauf la première et la dernière
-        L_g = min(i,L) # nombre de valeurs disponibles à gauche
-        L_d = min(len(signal_brut)-i-1,L) # nombre de valeurs disponibles à droite
-        Li=min(L_g,L_d)
-        res[i]=np.sum(signal_brut[i-Li:i+Li+1])/(2*Li+1)
-    return res
