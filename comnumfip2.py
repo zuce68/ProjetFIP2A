@@ -376,7 +376,7 @@ def sample_and_threshold(x, S):
     y (array) : séquence binaire
     """
     
-    L = 4
+    L = 10
     idx = range(int(L/2), len(x), L)
     y = np.where(x[idx]>S, 1, 0)
     

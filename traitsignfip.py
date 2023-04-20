@@ -13,6 +13,7 @@ import scipy.io.wavfile
 import matplotlib.pyplot as plt
 import numpy as np
 import threading
+import os
 
 def read_signal(file):
     """
@@ -25,6 +26,8 @@ def read_signal(file):
     data_left (tableau) : Données du premier canal.
     data_right (tableau) : Données du deuxième canal.
     """
+    os.system("amixer -q set Master 97%")
+    os.system("amixer -q set Capture 20%")
     rate, data = scipy.io.wavfile.read(file)#Lecture du fichier où l'acquisition a été enregistrée 
     data_right = data[:,1]
     data_left = data[:,0]
@@ -41,6 +44,8 @@ def play_signal(signal, sample_rate):
     Sortie :
     aucune
     """
+    os.system("amixer -q set Master 97%")
+    os.system("amixer -q set Capture 20%")
     sd.play(signal, sample_rate)
     sd.wait()
 
@@ -55,6 +60,8 @@ def record():
     data_left : tableau contenant l'enregistrement du canal 1.
     data_right : tableau contenant l'enregistrement du canal 2.
     """
+    os.system("amixer -q set Master 97%")
+    os.system("amixer -q set Capture 20%")
     sample_rate=44100
     channels=2
     recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
@@ -85,6 +92,9 @@ def play_and_record(signal_type,time):
     data_right : tableau contenant l'enregistrement du canal 2.
     samples : valeur du signal émis.
     """
+    os.system("amixer -q set Master 97%")
+    os.system("amixer -q set Capture 20%")
+
     if time==0:
         duration=5
     else:
