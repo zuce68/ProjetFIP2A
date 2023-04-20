@@ -25,7 +25,7 @@ def read_signal(file):
     data_left (tableau) : Données du premier canal.
     data_right (tableau) : Données du deuxième canal.
     """
-    rate, data = scipy.io.wavfile.read('enregistrement.wav')#Lecture du fichier où l'acquisition a été enregistrée 
+    rate, data = scipy.io.wavfile.read(file)#Lecture du fichier où l'acquisition a été enregistrée 
     data_right = data[:,1]
     data_left = data[:,0]
     return data_left,data_right
@@ -44,24 +44,38 @@ def play_signal(signal, sample_rate):
     sd.play(signal, sample_rate)
     sd.wait()
 
-def record_microphone():
-    recorded_audio = sd.rec(int(5 * sample_rate), samplerate=sample_rate, channels=channels)
+def record():
+    """
+    Permet de faire une acquisition des deux micros durant 2 secondes.
+    
+    Entrées :
+    aucune
+    
+    Sortie :
+    recorded_audio : tableau à 2 dimensions contenant l'enregistrement 
+    """
+    sample_rate=44100
+    channels=2
+    recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
     # Enregistrer les données audio dans un fichier WAV
-    file_name = "enregistrement.wav"
-    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
+
+    data_right = recorded_audio[:,1]
+    data_left = recorded_audio[:,0]
+    
+    return data_left,data_right
     
 # Fonction pour enregistrer le son du microphone
-def record_microphone(signal_type,time):
+def play_and_record(signal_type,time):
     """
     Acquisition du son via microphone.
     
     Entrées :
-    signal_type (string)      : nom du signal envoyé sr l'haut-parleur pour l'acquérir avec les micros.
+    signal_type (string)      : nom du signal envoyé sur l'haut-parleur pour l'acquérir avec les micros.
     time (decimal) : valeur de l'enregistrement en seconde 
 
     signal_type:
-    -noise : bruit blanc.
+    -whitenoise : bruit blanc.
     -sinus : sinusoïde de 440Hz.
     -clap : simulation d'un claquement avec une sinusoïde.
     
@@ -137,8 +151,19 @@ def record_microphone(signal_type,time):
     # Enregistrer le son du microphone dans un fichier WAV
     recorded_audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
-    # Enregistrer les données audio dans un fichier WAV
-    file_name = "enregistrement.wav"
-    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
     # Attendre la fin de la lecture du signal sur les haut-parleurs
     play_thread.join()
+
+    data_right = recorded_audio[:,1]
+    data_left = recorded_audio[:,0]
+
+    return data_left,data_right
+
+def lissage(signal_brut,L):
+    res = np.copy(signal_brut) # duplication des valeurs
+    for i in range (1,len(signal_brut)-1): # toutes les valeurs sauf la première et la dernière
+        L_g = min(i,L) # nombre de valeurs disponibles à gauche
+        L_d = min(len(signal_brut)-i-1,L) # nombre de valeurs disponibles à droite
+        Li=min(L_g,L_d)
+        res[i]=np.sum(signal_brut[i-Li:i+Li+1])/(2*Li+1)
+    return res

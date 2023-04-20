@@ -45,13 +45,25 @@ def play_signal(signal, sample_rate):
     sd.wait()
 
 def record():
+    """
+    Permet de faire une acquisition des deux micros durant 2 secondes.
+    
+    Entrées :
+    aucune
+    
+    Sortie :
+    recorded_audio : tableau à 2 dimensions contenant l'enregistrement 
+    """
     sample_rate=44100
     channels=2
     recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
     # Enregistrer les données audio dans un fichier WAV
-    file_name = "enregistrement.wav"
-    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
+
+    data_right = recorded_audio[:,1]
+    data_left = recorded_audio[:,0]
+    
+    return data_left,data_right
     
 # Fonction pour enregistrer le son du microphone
 def play_and_record(signal_type,time):
@@ -59,11 +71,11 @@ def play_and_record(signal_type,time):
     Acquisition du son via microphone.
     
     Entrées :
-    signal_type (string)      : nom du signal envoyé sr l'haut-parleur pour l'acquérir avec les micros.
+    signal_type (string)      : nom du signal envoyé sur l'haut-parleur pour l'acquérir avec les micros.
     time (decimal) : valeur de l'enregistrement en seconde 
 
     signal_type:
-    -noise : bruit blanc.
+    -whitenoise : bruit blanc.
     -sinus : sinusoïde de 440Hz.
     -clap : simulation d'un claquement avec une sinusoïde.
     
