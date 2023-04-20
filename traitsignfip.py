@@ -35,8 +35,8 @@ def play_signal(signal, sample_rate):
     Jouer un son sur l'haut-parleur.
     
     Entrées :
-    signal (array)      : signal
-    sample_rate (int)      : fréquence d'échantillonnage
+    signal (array)      : signal.
+    sample_rate (int)      : fréquence d'échantillonnage.
     
     Sortie :
     aucune
@@ -52,7 +52,8 @@ def record():
     aucune
     
     Sortie :
-    recorded_audio : tableau à 2 dimensions contenant l'enregistrement 
+    data_left : tableau contenant l'enregistrement du canal 1.
+    data_right : tableau contenant l'enregistrement du canal 2.
     """
     sample_rate=44100
     channels=2
@@ -72,7 +73,7 @@ def play_and_record(signal_type,time):
     
     Entrées :
     signal_type (string)      : nom du signal envoyé sur l'haut-parleur pour l'acquérir avec les micros.
-    time (decimal) : valeur de l'enregistrement en seconde 
+    time (decimal) : valeur de l'enregistrement en seconde.
 
     signal_type:
     -whitenoise : bruit blanc.
@@ -80,9 +81,10 @@ def play_and_record(signal_type,time):
     -clap : simulation d'un claquement avec une sinusoïde.
     
     Sortie :
-    aucune
+    data_left : tableau contenant l'enregistrement du canal 1.
+    data_right : tableau contenant l'enregistrement du canal 2.
+    samples : valeur du signal émis.
     """
-    global samples
     if time==0:
         duration=5
     else:
@@ -157,7 +159,7 @@ def play_and_record(signal_type,time):
     data_right = recorded_audio[:,1]
     data_left = recorded_audio[:,0]
 
-    return data_left,data_right
+    return data_left,data_right,samples
 
 def lissage(signal_brut,L):
     res = np.copy(signal_brut) # duplication des valeurs

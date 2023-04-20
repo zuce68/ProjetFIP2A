@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import threading
 
-def read_signal():
+def read_signal(file):
     """
     Permet de créer un tableau avec les valeurs d'un fichier son. 
     
@@ -25,7 +25,7 @@ def read_signal():
     data_left (tableau) : Données du premier canal.
     data_right (tableau) : Données du deuxième canal.
     """
-    rate, data = scipy.io.wavfile.read('enregistrement.wav')#Lecture du fichier où l'acquisition a été enregistrée 
+    rate, data = scipy.io.wavfile.read(file)#Lecture du fichier où l'acquisition a été enregistrée 
     data_right = data[:,1]
     data_left = data[:,0]
     return data_left,data_right
@@ -35,8 +35,8 @@ def play_signal(signal, sample_rate):
     Jouer un son sur l'haut-parleur.
     
     Entrées :
-    signal (array)      : signal
-    sample_rate (int)      : fréquence d'échantillonnage
+    signal (array)      : signal.
+    sample_rate (int)      : fréquence d'échantillonnage.
     
     Sortie :
     aucune
@@ -52,7 +52,8 @@ def record():
     aucune
     
     Sortie :
-    recorded_audio : tableau à 2 dimensions contenant l'enregistrement 
+    data_left : tableau contenant l'enregistrement du canal 1.
+    data_right : tableau contenant l'enregistrement du canal 2.
     """
     sample_rate=44100
     channels=2
@@ -72,7 +73,7 @@ def play_and_record(signal_type,time):
     
     Entrées :
     signal_type (string)      : nom du signal envoyé sur l'haut-parleur pour l'acquérir avec les micros.
-    time (decimal) : valeur de l'enregistrement en seconde 
+    time (decimal) : valeur de l'enregistrement en seconde.
 
     signal_type:
     -whitenoise : bruit blanc.
@@ -80,9 +81,10 @@ def play_and_record(signal_type,time):
     -clap : simulation d'un claquement avec une sinusoïde.
     
     Sortie :
-    aucune
+    data_left : tableau contenant l'enregistrement du canal 1.
+    data_right : tableau contenant l'enregistrement du canal 2.
+    samples : valeur du signal émis.
     """
-    global samples
     if time==0:
         duration=5
     else:
@@ -151,11 +153,13 @@ def play_and_record(signal_type,time):
     # Enregistrer le son du microphone dans un fichier WAV
     recorded_audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
-    # Enregistrer les données audio dans un fichier WAV
-    file_name = "enregistrement.wav"
-    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
     # Attendre la fin de la lecture du signal sur les haut-parleurs
     play_thread.join()
+
+    data_right = recorded_audio[:,1]
+    data_left = recorded_audio[:,0]
+
+    return data_left,data_right,samples
 
 def lissage(signal_brut,L):
     res = np.copy(signal_brut) # duplication des valeurs
