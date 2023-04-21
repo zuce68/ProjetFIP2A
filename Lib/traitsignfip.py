@@ -7,12 +7,33 @@ Contributeur : pierre.misiuk@etu.unistra.fr
 """
 
 import sounddevice as sd
-import soundfile as sf
 # Bibliothèques pour analyse traitement du signal
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
 import numpy as np
 import threading
+import subprocess
+
+def init_volume():
+    """
+    Permet de régler le volume de l'ordinateur pour assurer une bonne acquisition.
+    
+    Entrées :
+    aucune
+    
+    Sortie :
+    aucune
+    """
+    val = 100
+    val = float(int(val))
+    proc = subprocess.Popen('/usr/bin/amixer sset Master ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
+    proc.wait()
+    val = 15
+    val = float(int(val))
+    proc = subprocess.Popen('/usr/bin/amixer sset Capture ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
+    proc.wait()
+
+
 
 def read_signal(file):
     """
@@ -44,12 +65,12 @@ def play_signal(signal, sample_rate):
     sd.play(signal, sample_rate)
     sd.wait()
 
-def record():
+def record(time):
     """
-    Permet de faire une acquisition des deux micros durant 2 secondes.
+    Permet de faire une acquisition des deux micros durant "time" secondes.
     
     Entrées :
-    aucune
+    time (int)  : durée de l'acquisition en secondes. 
     
     Sortie :
     data_left : tableau contenant l'enregistrement du canal 1.
@@ -57,7 +78,7 @@ def record():
     """
     sample_rate=44100
     channels=2
-    recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
+    recorded_audio = sd.rec(int(time * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
     # Enregistrer les données audio dans un fichier WAV
 
@@ -85,6 +106,7 @@ def play_and_record(signal_type,time):
     data_right : tableau contenant l'enregistrement du canal 2.
     samples : valeur du signal émis.
     """
+
     if time==0:
         duration=5
     else:
@@ -160,12 +182,3 @@ def play_and_record(signal_type,time):
     data_left = recorded_audio[:,0]
 
     return data_left,data_right,samples
-
-def lissage(signal_brut,L):
-    res = np.copy(signal_brut) # duplication des valeurs
-    for i in range (1,len(signal_brut)-1): # toutes les valeurs sauf la première et la dernière
-        L_g = min(i,L) # nombre de valeurs disponibles à gauche
-        L_d = min(len(signal_brut)-i-1,L) # nombre de valeurs disponibles à droite
-        Li=min(L_g,L_d)
-        res[i]=np.sum(signal_brut[i-Li:i+Li+1])/(2*Li+1)
-    return res

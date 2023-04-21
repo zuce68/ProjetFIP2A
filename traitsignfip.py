@@ -7,17 +7,16 @@ Contributeur : pierre.misiuk@etu.unistra.fr
 """
 
 import sounddevice as sd
-import soundfile as sf
 # Bibliothèques pour analyse traitement du signal
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
 import numpy as np
 import threading
-import os
+import subprocess
 
 def init_volume():
     """
-    Permet de régler le volume de l'ordinateur pour assurer une bonne acquisition
+    Permet de régler le volume de l'ordinateur pour assurer une bonne acquisition.
     
     Entrées :
     aucune
@@ -25,8 +24,15 @@ def init_volume():
     Sortie :
     aucune
     """
-    os.system("amixer -q set Master 100%")
-    os.system("amixer -q set Capture 100%")
+    val = 100
+    val = float(int(val))
+    proc = subprocess.Popen('/usr/bin/amixer sset Master ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
+    proc.wait()
+    val = 15
+    val = float(int(val))
+    proc = subprocess.Popen('/usr/bin/amixer sset Capture ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
+    proc.wait()
+
 
 
 def read_signal(file):
@@ -59,12 +65,12 @@ def play_signal(signal, sample_rate):
     sd.play(signal, sample_rate)
     sd.wait()
 
-def record():
+def record(time):
     """
-    Permet de faire une acquisition des deux micros durant 2 secondes.
+    Permet de faire une acquisition des deux micros durant "time" secondes.
     
     Entrées :
-    aucune
+    time (int)  : durée de l'acquisition en secondes. 
     
     Sortie :
     data_left : tableau contenant l'enregistrement du canal 1.
@@ -72,7 +78,7 @@ def record():
     """
     sample_rate=44100
     channels=2
-    recorded_audio = sd.rec(int(2 * sample_rate), samplerate=sample_rate, channels=channels)
+    recorded_audio = sd.rec(int(time * sample_rate), samplerate=sample_rate, channels=channels)
     sd.wait()  # Attendre la fin de l'enregistrement
     # Enregistrer les données audio dans un fichier WAV
 
