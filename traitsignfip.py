@@ -7,6 +7,7 @@ Contributeur : pierre.misiuk@etu.unistra.fr
 """
 
 import sounddevice as sd
+import soundfile as sf
 # Bibliothèques pour analyse traitement du signal
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
@@ -88,7 +89,7 @@ def record(time):
     return data_left,data_right
     
 # Fonction pour enregistrer le son du microphone
-def play_and_record(signal_type,time):
+def play_and_record(signal_type,time,file_name):
     """
     Acquisition du son via microphone.
     
@@ -120,6 +121,8 @@ def play_and_record(signal_type,time):
     if signal_type == "whitenoise":
         zeros = np.zeros((duration-time)*sample_rate)
         samples = np.random.normal(0, 1, time*sample_rate)
+        file_name = "bruitblancsample.wav"
+        sf.write(file_name, samples, sample_rate, subtype='PCM_16')
         signal = np.concatenate((zeros,samples))
     elif signal_type == "pinknoise":
         zeros = np.zeros((duration-time)*sample_rate)
@@ -177,6 +180,9 @@ def play_and_record(signal_type,time):
     sd.wait()  # Attendre la fin de l'enregistrement
     # Attendre la fin de la lecture du signal sur les haut-parleurs
     play_thread.join()
+
+    file_name = "bruitblanc.wav"
+    sf.write(file_name, recorded_audio, sample_rate, subtype='PCM_16')
 
     data_right = recorded_audio[:,1]
     data_left = recorded_audio[:,0]
