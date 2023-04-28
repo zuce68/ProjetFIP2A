@@ -34,8 +34,12 @@ def plot_signal(signal):
     Sortie :
     aucune
     """
+    t=np.linspace(0,len(signal)/44100,len(signal))
     plt.figure()
-    plt.plot(signal)
+    plt.title('Interrcorrélation Ryh')
+    plt.xlabel('Temps (s)')
+    plt.ylabel('Amplitude')
+    plt.plot(t,signal)
     plt.show()
 
 def AMI_signal_generator(message):
@@ -90,16 +94,12 @@ def NRZ_signal_generator(message):
     signal_nrz = np.zeros(0)
     #attention, ici les valeurs sont inversée
     #preparation de la trame de début et ajout au message
-    start_trame = "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    bit_start = np.unpackbits(np.array([ord(c) for c in start_trame], dtype=np.uint8))
-    print(bit_start)
-    bits = np.insert(bits,0,bit_start)
     print(bits)
     for bit in bits:
         if bit == 0:
-            signal_nrz = np.append(signal_nrz, amplitude * np.ones_like(temps_bit))
-        else:
             signal_nrz = np.append(signal_nrz, -amplitude * np.ones_like(temps_bit))
+        else:
+            signal_nrz = np.append(signal_nrz, amplitude * np.ones_like(temps_bit))
          # Ajouter des zéros au début et à la fin du signal
     plt.figure()
     plt.plot(signal_nrz)
