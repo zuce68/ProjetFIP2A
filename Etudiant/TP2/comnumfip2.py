@@ -19,11 +19,29 @@ from scipy.signal import find_peaks
 
 
 def send_signal_to_canal(signal):
+    
+    """
+    Envoie un signal audio au canal de sortie.
+    
+    Entrées :
+    - signal : numpy.ndarray contenant le signal audio à envoyer.
+    Sorties : Aucune
+    """
+    
     sd.play(signal, 44100)
     sd.wait()
     
 def add_start_and_stop_bit(bits):
-
+    
+    """
+    Ajoute des bits de synchronisation, de début et de fin à une trame de bits.
+    
+    Entrée :
+    - bits : numpy.ndarray contenant la trame de bits à laquelle ajouter les bits de synchronisation, de début et de fin.
+    Sortie :
+    - numpy.ndarray contenant la trame de bits avec les bits de synchronisation, de début et de fin ajoutés.    
+    """
+    
     #bit de synchronisation pour que le signal soit détecté
     bit_sync         =  np.zeros(441) #441 bits pour faire 100 ms
     bit_sync[1:]     =  2
@@ -43,12 +61,33 @@ def add_start_and_stop_bit(bits):
     return bits
 
 def string_to_ascii(message):
-     #Convertir le message en une séquence de bits (0 et 1) en ASCII
-     bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
-     return bits
+    
+    """
+    Convertit une chaîne de caractères en une séquence de bits en ASCII.
+    
+    Entrée :
+    - message : chaîne de caractères à convertir en bits.
+
+    Sortie :
+    - numpy.ndarray contenant la séquence de bits en ASCII.    
+    """
+    
+    bits = np.unpackbits(np.array([ord(c) for c in message], dtype=np.uint8))
+    return bits
     
 
 def ami_signal_generator(bits):
+    
+    """
+    Génère un signal AMI à partir d'une séquence de bits donnée.
+
+    Entrée :
+    - bits : séquence de bits à moduler.
+
+    Sortie :
+    - numpy.ndarray contenant le signal AMI modulé correspondant à la séquence de bits.   
+    """
+    
     # Paramètres du signal AMI
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5   # Amplitude du signal
@@ -74,7 +113,19 @@ def ami_signal_generator(bits):
     signal_ami = np.pad(signal_ami, (int(framerate/2), int(framerate/2)), 'constant')
     return signal_ami
 
+
 def nrz_signal_generator(bits):
+    
+    """
+    Génère un signal NRZ à partir d'une séquence de bits donnée.
+
+    Entrée :
+    - bits : séquence de bits à moduler.
+
+    Sortie :
+    - numpy.ndarray contenant le signal NRZ modulé correspondant à la séquence de bits.   
+    """
+    
     # Paramètres du signal NRZ
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5 # Amplitude du signal
@@ -99,6 +150,17 @@ def nrz_signal_generator(bits):
     return signal_nrz
 
 def manchester_signal_generator(bits):
+    
+    """
+    Génère un signal Manchester à partir d'une séquence de bits donnée.
+
+    Entrée :
+    - bits : séquence de bits à moduler.
+
+    Sortie :
+    - numpy.ndarray contenant le signal Manchester modulé correspondant à la séquence de bits.   
+    """
+    
     # Paramètres du signal Manchester
     framerate = 44100 # Fréquence d'échantillonnage en Hz
     amplitude = 0.5   # Amplitude du signal
@@ -580,6 +642,7 @@ def bin2ascii(bits):
     Sortie :
     ascii_str (string) : chaîne de caractère ascii
     """
+    
     bits = bits.flatten()
     bits_str =''.join(str(bit) for bit in bits)
     bytes_list = [bits_str[i:i+8] for i in range(0, len(bits_str), 8)] # Convertir chaque groupe de 8 bits en un caractère ASCII 
@@ -600,6 +663,7 @@ def sample_and_threshold_Manchester(x, S,sample_time_shift):
     Sortie :
     y (array) : séquence binaire
     """
+    
     shifted_index = int((sample_time_shift)*10/(1/4410))
     L = 5
     idx = range(int(L/2)-(np.abs(shifted_index)), len(x), L)
@@ -611,7 +675,6 @@ def sample_and_threshold_Manchester(x, S,sample_time_shift):
     #plt.plot(idx,x[idx],'.')
     #plt.xlim(0,100)
     #plt.show()
-
     return y 
 
 def sample_and_threshold_NRZ(x, S,sample_time_shift):
@@ -628,6 +691,7 @@ def sample_and_threshold_NRZ(x, S,sample_time_shift):
     Sortie :
     y (array) : séquence binaire
     """
+    
     shifted_index = int((sample_time_shift)*10/(1/4410))
     L = 10 
     idx = range(int(L/2)-(np.abs(shifted_index)), len(x), L)
@@ -638,7 +702,6 @@ def sample_and_threshold_NRZ(x, S,sample_time_shift):
     #plt.plot(idx,x[idx],'.')
     #plt.xlim(0,100)
     #plt.show()
-    
     return y
 
 
@@ -656,21 +719,21 @@ def sample_and_threshold_AMI(x, S,sample_time_shift):
     Sortie :
     y (array) : séquence binaire
     """
+    
     shifted_index = int((sample_time_shift)*10/(1/4410))
     L = 10
     idx = range(int(L/2)-(np.abs(shifted_index)), len(x), L)
     y = np.where((x[idx]>S) | (x[idx]<-S), 1, 0) 
-
     #plt.figure()
     #plt.title("AMI")
     #plt.plot(x)
     #plt.plot(idx,x[idx],'.')
     #plt.xlim(0,100)
     #plt.show()
-    
     return y
 
 def init_volume():
+    
     """
     Permet de régler le volume de l'ordinateur pour assurer une bonne acquisition.
     
@@ -680,6 +743,7 @@ def init_volume():
     Sortie :
     aucune
     """
+    
     val = 100
     val = float(int(val))
     proc = subprocess.Popen('/usr/bin/amixer sset Master ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
@@ -690,6 +754,7 @@ def init_volume():
     proc.wait()
 
 def check_config_transmitter(): 
+    
     """
     Envoi un signal connu au récepteur pour vérifier si la configuration est correcte
     
@@ -699,12 +764,14 @@ def check_config_transmitter():
     Sortie :
     aucune
     """
+    
     message = "test config ok"
     signal  = nrz_signal_generator(message)   
     send_signal_to_canal(signal)
 
 
 def check_config_receiver(): 
+    
     """
     Entrées :
     aucune
@@ -741,13 +808,7 @@ def check_config_receiver():
     else :
         print("Erreur ajuster les paramètres manuellement")
     
-    
-
-
-
-    
-
-
+  
 
 def _find_start_bit(signal,threshold):
 
@@ -791,6 +852,7 @@ def _find_stop_bit(signal,threshold):
     Sortie :
     Valeur de l'échantillon à laquelle le bit de stop a commencé
     """
+    
     #recherche tout les piques positif est négatif du signal au dessus du seuil de 0.5
     if signal.ndim == 2:
         positive_peaks,_ = find_peaks( signal[:,0], height=threshold) 
@@ -813,16 +875,18 @@ def _find_stop_bit(signal,threshold):
                 return n[i]
 
 def acquire_signal(fe: int, duration: float):
-    """
-    Acquisition du message de la communication numérique
-
-    Entrée :
-    - fe (int): Taux d'échantillonnage de l'acquisition.
-    - duration (float): Durée de l'acquisition en secondes.
     
-    Sortie :
-    - numpy.ndarray: Signal contenant uniquement le message 
     """
+    Acquisition du signal en communication numérique
+
+    Entrées :
+    - fe (int) : Taux d'échantillonnage de l'acquisition.
+    - duration (float) : Durée de l'acquisition en secondes.
+
+    Sortie :
+    - numpy.ndarray : Signal acquis.
+    """
+    
     # Acquisition du signal.
     signal = sd_cust.rec(int(duration*fe), samplerate=fe, channels=1)
     sd_cust.wait()
@@ -836,18 +900,28 @@ def acquire_signal(fe: int, duration: float):
 
 
 def get_message_from_signal(signal,threshold):
+    
+    """
+    Récupère le message à partir du signal
+    Entrées :
+    - signal : Signal dans lequel le message est recherché.
+    - threshold : Seuil de détection des bits de start et de stop.
 
+    Sortie :
+    - numpy.ndarray : Signal contenant uniquement le message.
+    """
+    
     start_sample = _find_start_bit(signal,threshold)
     stop_sample  = _find_stop_bit(signal,threshold)
 
 
     #affichage du bit de start
-   # n = np.arange(0,len(signal))/44100
-   # plt.figure(figsize=(10,5))
-   # plt.plot(n,signal)
-   # plt.plot(n[start_sample], signal[start_sample], "o") 
-   # plt.xlim(0.030,0.06)
-   # plt.show()
+    #n = np.arange(0,len(signal))/44100
+    #plt.figure(figsize=(10,5))
+    #plt.plot(n,signal)
+    #plt.plot(n[start_sample], signal[start_sample], "o") 
+    #plt.xlim(0.030,0.06)
+    #plt.show()
 
     #supprime toutes les valeurs 100ms après et avant les bits de start et stop pour ne garder que le message
     signal = signal[:stop_sample-4400]
